@@ -1,0 +1,25 @@
+# Entorno virtual
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Secretos y configuracion local
+.env
+
+# Base de datos local (se regenera con scripts/init_db.py)
+data/*.db
+data/*.sqlite3
+data/*.db-journal
+
+# IDE y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs locales
+*.log
