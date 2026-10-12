@@ -3,12 +3,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.config import ENTORNO, VERSION
 from app.database import init_schema
-from app.routers import dispositivos
+from app.routers import dispositivos, syslog
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_schema()          # garantiza que las tablas existan al arrancar
+    init_schema()          # garantiza tablas y migraciones al arrancar
     yield
 
 
@@ -19,6 +19,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(dispositivos.router)
+app.include_router(syslog.router)
 
 
 @app.get("/api/salud", tags=["Sistema"])
