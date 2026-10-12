@@ -1,5 +1,6 @@
-"""Acceso a SQLite: conexión y creación del esquema."""
+"""Acceso a SQLite: conexión, sesión transaccional y creación del esquema."""
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 from app.config import DB_PATH
 
@@ -13,6 +14,24 @@ def get_connection() -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
+
+
+@contextmanager
+def db_session():
+    """Sesión transaccional: commit si todo sale bien, rollback si hay error.
+
+    Se usa un solo bloque por petición, de modo que el cambio de datos y su
+    registro de auditoría se guardan juntos o no se guardan.
+    """
+    conn = get_connection()
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def init_schema() -> None:
