@@ -8,8 +8,8 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import ENTORNO, VERSION
 from app.database import init_schema
-from app.routers import dashboard, dispositivos, incidentes, syslog
-
+from app.routers import (configuraciones, consola, dashboard, dispositivos,
+                         incidentes, syslog)
 STATIC_DIR = Path(__file__).parent / "static"
 
 # Política de seguridad de contenido: el navegador solo ejecuta scripts y estilos
@@ -49,6 +49,8 @@ app.include_router(dispositivos.router)
 app.include_router(syslog.router)
 app.include_router(incidentes.router)
 app.include_router(dashboard.router)
+app.include_router(configuraciones.router)
+app.include_router(consola.router)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 

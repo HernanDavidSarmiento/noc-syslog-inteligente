@@ -18,6 +18,8 @@
       <button type="button" data-vista="eventos">Eventos</button>
       <button type="button" data-vista="incidentes">Incidentes</button>
       <button type="button" data-vista="inventario">Inventario</button>
+            <button type="button" data-vista="configuraciones">Configuraciones</button>
+      <button type="button" data-vista="consola">Consola</button>
     </nav>
   </header>
 
@@ -148,6 +150,57 @@
       </article>
       <div class="panel scroll"><table id="tabla-inventario"></table></div>
     </section>
+        <!-- ============ CONFIGURACIONES SYSLOG ============ -->
+    <section id="vista-configuraciones" class="vista oculto">
+      <h2>Generador de configuraciones Syslog</h2>
+      <p class="suave">Genera una PROPUESTA comentada. La aplicación no se conecta a ningún equipo:
+        un responsable debe revisarla y aplicarla de forma manual y autorizada.</p>
+      <article class="panel">
+        <form id="form-cfg" class="form-grid">
+          <label>Marca
+            <select id="cfg-marca"><option>Cisco</option><option>Fortinet</option><option>Huawei</option></select>
+          </label>
+          <label>Equipo (opcional) <select id="cfg-equipo"></select></label>
+          <label>IP del colector NOC <input id="cfg-colector" required value="192.0.2.50" maxlength="45"></label>
+          <label>Puerto <input id="cfg-puerto" type="number" min="1" max="65535" value="514"></label>
+          <label>Protocolo
+            <select id="cfg-proto"><option value="udp">UDP</option><option value="tcp">TCP</option></select>
+          </label>
+          <label>Enviar severidades 0 hasta <select id="cfg-sev"></select></label>
+          <label>Facility <select id="cfg-facility"></select></label>
+          <label>Servidor NTP (opcional) <input id="cfg-ntp" value="192.0.2.1" maxlength="45"></label>
+          <div class="botones"><button type="submit">Generar configuración</button></div>
+        </form>
+      </article>
+      <article class="panel">
+        <div class="acciones-vista">
+          <h3 id="cfg-titulo">Resultado</h3>
+          <button type="button" id="cfg-copiar" class="secundario mini">Copiar</button>
+        </div>
+        <pre id="cfg-salida" class="codigo">(Genera una configuración para verla aquí)</pre>
+        <h4>Verificación sugerida</h4>
+        <ul id="cfg-verif"></ul>
+      </article>
+    </section>
+
+    <!-- ============ CONSOLA SIMULADA ============ -->
+    <section id="vista-consola" class="vista oculto">
+      <h2>Consola simulada (solo lectura)</h2>
+      <p class="suave">Simulación tipo PuTTY: no se conecta a ningún equipo. Solo responden los comandos
+        de la lista permitida; todo lo demás se bloquea y queda en auditoría. Escribe <code>help</code>.</p>
+      <div class="filtros">
+        <label>Equipo <select id="con-equipo"></select></label>
+        <button type="button" id="con-limpiar" class="secundario">Limpiar pantalla</button>
+      </div>
+      <div id="con-ejemplos" class="botones"></div>
+      <div class="terminal">
+        <div id="con-salida"></div>
+        <form id="con-form" class="con-form">
+          <span id="con-prompt"></span>
+          <input id="con-entrada" maxlength="256" autocomplete="off" spellcheck="false" aria-label="Comando">
+        </form>
+      </div>
+    </section>
   </main>
 
   <!-- Diálogo: nuevo incidente -->
@@ -178,5 +231,6 @@
   </dialog>
 
   <script src="/static/app.js"></script>
+    <script src="/static/herramientas.js"></script>
 </body>
 </html>
