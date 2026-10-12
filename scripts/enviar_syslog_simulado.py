@@ -60,3 +60,8 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+    # en mensajes_base():
+t3164 = datetime.now(timezone.utc).strftime("%b %d %H:%M:%S")
+# en tormenta():
+t = datetime.now(timezone.utc).strftime("%b %d %H:%M:%S")
