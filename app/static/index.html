@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NOC Syslog Inteligente</title>
+  <link rel="stylesheet" href="/static/estilos.css">
+    <link rel="stylesheet" href="/static/defensa.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="marca">
+      <h1>NOC Syslog Inteligente</h1>
+      <span class="chip">MVP v0.2.0</span>
+      <span class="chip chip-sim">Datos de ejemplo: SIMULADOS</span>
+    </div>
+    <nav id="menu">
+      <button type="button" data-vista="dashboard" class="activo">Dashboard</button>
+      <button type="button" data-vista="eventos">Eventos</button>
+      <button type="button" data-vista="incidentes">Incidentes</button>
+      <button type="button" data-vista="inventario">Inventario</button>
+            <button type="button" data-vista="configuraciones">Configuraciones</button>
+      <button type="button" data-vista="consola">Consola</button>
+            <button type="button" data-vista="defensa">Defensa IA</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="aviso" class="aviso oculto" role="status"></div>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section id="vista-dashboard" class="vista">
+      <div class="acciones-vista">
+        <h2>Panel general</h2>
+        <span id="ultima-actualizacion" class="suave"></span>
+        <button type="button" id="btn-refrescar" class="secundario">Actualizar</button>
+      </div>
+      <div class="tarjetas" id="tarjetas"></div>
+      <div class="rejilla">
+        <article class="panel">
+          <h3>Estado de dispositivos</h3>
+          <div class="scroll"><table id="tabla-dispositivos"></table></div>
+        </article>
+        <article class="panel">
+          <h3>Eventos por severidad</h3>
+          <div id="grafico-sev"></div>
+        </article>
+      </div>
+      <article class="panel">
+        <h3>Eventos críticos (severidad 0 a 2)</h3>
+        <div class="scroll"><table id="tabla-criticos"></table></div>
+      </article>
+      <article class="panel">
+        <h3>Eventos recientes</h3>
+        <div class="scroll"><table id="tabla-recientes"></table></div>
+      </article>
+      <article class="panel">
+        <h3>Incidentes sin cerrar</h3>
+        <div class="scroll"><table id="tabla-inc-dash"></table></div>
+      </article>
+    </section>
+
+    <!-- ============ EVENTOS ============ -->
+    <section id="vista-eventos" class="vista oculto">
+      <h2>Eventos Syslog</h2>
+      <form id="form-filtros-eventos" class="filtros">
+        <label>Desde <input type="date" id="f-desde"></label>
+        <label>Hasta <input type="date" id="f-hasta"></label>
+        <label>Marca
+          <select id="f-marca">
+            <option value="">Todas</option>
+            <option>Cisco</option><option>Fortinet</option>
+            <option>Huawei</option><option>Otro</option>
+          </select>
+        </label>
+        <label>Equipo
+          <select id="f-equipo"><option value="">Todos</option></select>
+        </label>
+        <label>Severidad
+          <select id="f-sev">
+            <option value="">Todas</option>
+            <option value="max2">Críticos (0 a 2)</option>
+            <option value="max4">Warning o más grave (0 a 4)</option>
+            <option value="0">0 Emergency</option>
+            <option value="1">1 Alert</option>
+            <option value="2">2 Critical</option>
+            <option value="3">3 Error</option>
+            <option value="4">4 Warning</option>
+            <option value="5">5 Notice</option>
+            <option value="6">6 Informational</option>
+            <option value="7">7 Debug</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="f-sosp"> Solo sospechosos</label>
+        <button type="submit">Filtrar</button>
+        <button type="button" id="btn-limpiar" class="secundario">Limpiar</button>
+      </form>
+      <div class="panel scroll"><table id="tabla-eventos"></table></div>
+      <div class="paginacion">
+        <button type="button" id="pag-ant" class="secundario">Anterior</button>
+        <span id="pag-info" class="suave"></span>
+        <button type="button" id="pag-sig" class="secundario">Siguiente</button>
+      </div>
+    </section>
+
+    <!-- ============ INCIDENTES ============ -->
+    <section id="vista-incidentes" class="vista oculto">
+      <div class="acciones-vista">
+        <h2>Incidentes</h2>
+        <label class="inline">Estado
+          <select id="fi-estado">
+            <option value="">Todos</option>
+            <option value="abierto">abierto</option>
+            <option value="asignado">asignado</option>
+            <option value="en_progreso">en progreso</option>
+            <option value="resuelto">resuelto</option>
+            <option value="cerrado">cerrado</option>
+          </select>
+        </label>
+        <button type="button" id="btn-nuevo-inc">Nuevo incidente</button>
+      </div>
+      <div class="panel scroll"><table id="tabla-incidentes"></table></div>
+    </section>
+
+    <!-- ============ INVENTARIO ============ -->
+    <section id="vista-inventario" class="vista oculto">
+      <h2>Inventario de equipos</h2>
+      <article class="panel">
+        <h3 id="d-titulo">Nuevo equipo</h3>
+        <form id="form-disp" class="form-grid">
+          <label>Nombre <input id="d-nombre" required minlength="3" maxlength="64" pattern="[A-Za-z0-9_.\-]+"></label>
+          <label>IP (simulada o privada) <input id="d-ip" required maxlength="45"></label>
+          <label>Marca
+            <select id="d-marca">
+              <option>Cisco</option><option>Fortinet</option>
+              <option>Huawei</option><option>Otro</option>
+            </select>
+          </label>
+          <label>Modelo <input id="d-modelo" required maxlength="64"></label>
+          <label>Versión <input id="d-version" required maxlength="64"></label>
+          <label>Ubicación <input id="d-ubicacion" required maxlength="128"></label>
+          <label>Estado
+            <select id="d-estado">
+              <option>activo</option><option>inactivo</option><option>mantenimiento</option>
+            </select>
+          </label>
+          <div class="botones">
+            <button type="submit" id="d-guardar">Agregar equipo</button>
+            <button type="button" id="d-cancelar" class="secundario oculto">Cancelar edición</button>
+          </div>
+        </form>
+      </article>
+      <div class="panel scroll"><table id="tabla-inventario"></table></div>
+    </section>
+        <!-- ============ CONFIGURACIONES SYSLOG ============ -->
+    <section id="vista-configuraciones" class="vista oculto">
+      <h2>Generador de configuraciones Syslog</h2>
+      <p class="suave">Genera una PROPUESTA comentada. La aplicación no se conecta a ningún equipo:
+        un responsable debe revisarla y aplicarla de forma manual y autorizada.</p>
+      <article class="panel">
+        <form id="form-cfg" class="form-grid">
+          <label>Marca
+            <select id="cfg-marca"><option>Cisco</option><option>Fortinet</option><option>Huawei</option></select>
+          </label>
+          <label>Equipo (opcional) <select id="cfg-equipo"></select></label>
+          <label>IP del colector NOC <input id="cfg-colector" required value="192.0.2.50" maxlength="45"></label>
+          <label>Puerto <input id="cfg-puerto" type="number" min="1" max="65535" value="514"></label>
+          <label>Protocolo
+            <select id="cfg-proto"><option value="udp">UDP</option><option value="tcp">TCP</option></select>
+          </label>
+          <label>Enviar severidades 0 hasta <select id="cfg-sev"></select></label>
+          <label>Facility <select id="cfg-facility"></select></label>
+          <label>Servidor NTP (opcional) <input id="cfg-ntp" value="192.0.2.1" maxlength="45"></label>
+          <div class="botones"><button type="submit">Generar configuración</button></div>
+        </form>
+      </article>
+      <article class="panel">
+        <div class="acciones-vista">
+          <h3 id="cfg-titulo">Resultado</h3>
+          <button type="button" id="cfg-copiar" class="secundario mini">Copiar</button>
+        </div>
+        <pre id="cfg-salida" class="codigo">(Genera una configuración para verla aquí)</pre>
+        <h4>Verificación sugerida</h4>
+        <ul id="cfg-verif"></ul>
+      </article>
+    </section>
+
+    <!-- ============ CONSOLA SIMULADA ============ -->
+    <section id="vista-consola" class="vista oculto">
+      <h2>Consola simulada (solo lectura)</h2>
+      <p class="suave">Simulación tipo PuTTY: no se conecta a ningún equipo. Solo responden los comandos
+        de la lista permitida; todo lo demás se bloquea y queda en auditoría. Escribe <code>help</code>.</p>
+      <div class="filtros">
+        <label>Equipo <select id="con-equipo"></select></label>
+        <button type="button" id="con-limpiar" class="secundario">Limpiar pantalla</button>
+      </div>
+      <div id="con-ejemplos" class="botones"></div>
+      <div class="terminal">
+        <div id="con-salida"></div>
+        <form id="con-form" class="con-form">
+          <span id="con-prompt"></span>
+          <input id="con-entrada" maxlength="256" autocomplete="off" spellcheck="false" aria-label="Comando">
+        </form>
+      </div>
+    </section>
+        <!-- ============ DEFENSA IA ============ -->
+    <section id="vista-defensa" class="vista oculto">
+      <h2>Defensa frente a agentes de IA</h2>
+      <article class="panel">
+        <h3>Flujo obligatorio</h3>
+        <ol id="flujo-pasos" class="flujo"></ol>
+        <ul class="politica suave">
+          <li>Los logs son datos no confiables: nunca se ejecutan ni se usan como instrucciones.</li>
+          <li>Solo existen acciones de un catálogo cerrado, con parámetros validados.</li>
+          <li>Quien propone no puede aprobar; un agente de IA o el sistema nunca aprueban.</li>
+          <li>Solo se ejecuta lo aprobado por una persona, y cada paso queda en auditoría.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h3>Simular la propuesta de una acción</h3>
+        <form id="form-def" class="form-grid">
+          <label>Acción <select id="def-accion"></select></label>
+          <label>Equipo <select id="def-disp"></select></label>
+          <div id="def-campos-inc" class="oculto form-grid">
+            <label>Título del incidente <input id="def-titulo" maxlength="120" value="Revisar fallas de login"></label>
+            <label>Severidad <select id="def-sev"></select></label>
+          </div>
+          <label>Propone <input id="def-proponente" required minlength="2" maxlength="64" value="agente_ia_demo"></label>
+          <label>Tipo de actor
+            <select id="def-tipo"><option value="agente_ia">agente_ia</option><option value="humano">humano</option><option value="sistema">sistema</option></select>
+          </label>
+          <label>Motivo (texto no confiable) <input id="def-motivo" maxlength="500" value="Varios intentos de login fallidos"></label>
+          <div class="botones"><button type="submit">Proponer acción</button></div>
+        </form>
+        <p id="def-descripcion" class="suave"></p>
+      </article>
+      <article class="panel">
+        <div class="acciones-vista">
+          <h3>Acciones propuestas</h3>
+          <label class="inline">Revisor humano <input id="def-revisor" maxlength="64" value="ana.perez"></label>
+          <label class="inline">Estado
+            <select id="def-filtro">
+              <option value="">Todos</option><option>propuesta</option><option>en_revision</option>
+              <option>aprobada</option><option>rechazada</option><option>ejecutada</option>
+              <option>verificada</option><option>fallida</option>
+            </select>
+          </label>
+        </div>
+        <div class="scroll"><table id="tabla-acciones"></table></div>
+      </article>
+    </section>
+  </main>
+
+  <!-- Diálogo: nuevo incidente -->
+  <dialog id="dlg-nuevo-inc">
+    <form id="form-nuevo-inc">
+      <h3>Nuevo incidente</h3>
+      <p class="msg-dlg oculto"></p>
+      <input type="hidden" id="ni-evento">
+      <label>Título <input id="ni-titulo" required minlength="3" maxlength="120"></label>
+      <label>Descripción <textarea id="ni-desc" rows="3" maxlength="2000"></textarea></label>
+      <label>Severidad <select id="ni-sev"></select></label>
+      <label>Equipo <select id="ni-equipo"><option value="">(ninguno)</option></select></label>
+      <label>Responsable (opcional) <input id="ni-asig" maxlength="64"></label>
+      <div class="botones">
+        <button type="submit">Crear incidente</button>
+        <button type="button" id="ni-cancelar" class="secundario">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Diálogo: detalle y seguimiento -->
+  <dialog id="dlg-detalle-inc" class="ancho">
+    <p class="msg-dlg oculto"></p>
+    <div id="detalle-inc"></div>
+    <div class="botones">
+      <button type="button" id="di-cerrar" class="secundario">Cerrar ventana</button>
+    </div>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+    <script src="/static/herramientas.js"></script>
+      <script src="/static/defensa.js"></script>
+</body>
+</html>

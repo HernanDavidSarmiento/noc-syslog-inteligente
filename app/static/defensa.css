@@ -1,0 +1,10 @@
+/* Fase 6: vista "Defensa IA" */
+.flujo { display:flex; flex-wrap:wrap; gap:6px; list-style:none; padding:0; margin:0 0 6px; counter-reset:paso; }
+.flujo li { counter-increment:paso; background:#eef2f6; border:1px solid var(--borde); border-radius:16px; padding:3px 12px; font-size:12px; }
+.flujo li::before { content:counter(paso) ". "; color:var(--suave); }
+.flujo li.paso-humano { background:#fff3cd; border-color:#ffe08a; font-weight:600; }
+.politica li { margin:3px 0; }
+.acc-propuesta { background:#78909c; } .acc-en_revision { background:#1976d2; }
+.acc-aprobada { background:#2e7d32; } .acc-rechazada { background:#c62828; }
+.acc-ejecutada { background:#ef6c00; } .acc-verificada { background:#1b5e20; }
+.acc-fallida { background:#7f0000; }
