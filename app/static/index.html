@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NOC Syslog Inteligente</title>
   <link rel="stylesheet" href="/static/estilos.css">
+    <link rel="stylesheet" href="/static/defensa.css">
 </head>
 <body>
   <header class="barra">
@@ -20,6 +21,7 @@
       <button type="button" data-vista="inventario">Inventario</button>
             <button type="button" data-vista="configuraciones">Configuraciones</button>
       <button type="button" data-vista="consola">Consola</button>
+            <button type="button" data-vista="defensa">Defensa IA</button>
     </nav>
   </header>
 
@@ -201,6 +203,52 @@
         </form>
       </div>
     </section>
+        <!-- ============ DEFENSA IA ============ -->
+    <section id="vista-defensa" class="vista oculto">
+      <h2>Defensa frente a agentes de IA</h2>
+      <article class="panel">
+        <h3>Flujo obligatorio</h3>
+        <ol id="flujo-pasos" class="flujo"></ol>
+        <ul class="politica suave">
+          <li>Los logs son datos no confiables: nunca se ejecutan ni se usan como instrucciones.</li>
+          <li>Solo existen acciones de un catálogo cerrado, con parámetros validados.</li>
+          <li>Quien propone no puede aprobar; un agente de IA o el sistema nunca aprueban.</li>
+          <li>Solo se ejecuta lo aprobado por una persona, y cada paso queda en auditoría.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h3>Simular la propuesta de una acción</h3>
+        <form id="form-def" class="form-grid">
+          <label>Acción <select id="def-accion"></select></label>
+          <label>Equipo <select id="def-disp"></select></label>
+          <div id="def-campos-inc" class="oculto form-grid">
+            <label>Título del incidente <input id="def-titulo" maxlength="120" value="Revisar fallas de login"></label>
+            <label>Severidad <select id="def-sev"></select></label>
+          </div>
+          <label>Propone <input id="def-proponente" required minlength="2" maxlength="64" value="agente_ia_demo"></label>
+          <label>Tipo de actor
+            <select id="def-tipo"><option value="agente_ia">agente_ia</option><option value="humano">humano</option><option value="sistema">sistema</option></select>
+          </label>
+          <label>Motivo (texto no confiable) <input id="def-motivo" maxlength="500" value="Varios intentos de login fallidos"></label>
+          <div class="botones"><button type="submit">Proponer acción</button></div>
+        </form>
+        <p id="def-descripcion" class="suave"></p>
+      </article>
+      <article class="panel">
+        <div class="acciones-vista">
+          <h3>Acciones propuestas</h3>
+          <label class="inline">Revisor humano <input id="def-revisor" maxlength="64" value="ana.perez"></label>
+          <label class="inline">Estado
+            <select id="def-filtro">
+              <option value="">Todos</option><option>propuesta</option><option>en_revision</option>
+              <option>aprobada</option><option>rechazada</option><option>ejecutada</option>
+              <option>verificada</option><option>fallida</option>
+            </select>
+          </label>
+        </div>
+        <div class="scroll"><table id="tabla-acciones"></table></div>
+      </article>
+    </section>
   </main>
 
   <!-- Diálogo: nuevo incidente -->
@@ -232,5 +280,6 @@
 
   <script src="/static/app.js"></script>
     <script src="/static/herramientas.js"></script>
+      <script src="/static/defensa.js"></script>
 </body>
 </html>

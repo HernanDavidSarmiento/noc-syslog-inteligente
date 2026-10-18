@@ -1,4 +1,4 @@
-"""Acceso a SQLite: conexión, sesión transaccional y creación del esquema."""
+"""Acceso a SQLite: conexión, sesión transaccional, migraciones y creación del esquema."""
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
@@ -35,8 +35,11 @@ def _migrar(conn: sqlite3.Connection) -> None:
     columnas = {f["name"] for f in conn.execute("PRAGMA table_info(eventos)")}
     if "repeticiones" not in columnas:
         # Fase 3: contador de mensajes idénticos deduplicados
-        conn.execute(
-            "ALTER TABLE eventos ADD COLUMN repeticiones INTEGER NOT NULL DEFAULT 1")
+        conn.execute("ALTER TABLE eventos ADD COLUMN repeticiones INTEGER NOT NULL DEFAULT 1")
+    cols_acc = {f["name"] for f in conn.execute("PRAGMA table_info(acciones_propuestas)")}
+    if "motivo" not in cols_acc:
+        # Fase 6: justificación escrita por quien propone la acción (texto NO confiable)
+        conn.execute("ALTER TABLE acciones_propuestas ADD COLUMN motivo TEXT")
 
 
 def init_schema() -> None:
